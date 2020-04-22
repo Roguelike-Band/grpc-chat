@@ -1,27 +1,24 @@
 package ru.spbau.chat
 
-import com.google.protobuf.util.Durations
 import io.grpc.Server
 import io.grpc.ServerBuilder
+import io.grpc.stub.StreamObserver
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import ru.spbau.grpc.chat.ChatServerGrpc
+import ru.spbau.grpc.chat.Message
 import java.util.concurrent.ConcurrentHashMap
 
-class ChatServer private constructor(
+class ChatServer constructor(
     val port: Int,
-    val server: Server,
-    val login: String
+    val login: String,
+    private val serverHelper: ServerHelper
 ) {
-    constructor(
-        serverBuilder: ServerBuilder<*>,
-        port: Int,
-        login: String,
-        messages: Collection<Message>
-    ) : this(
-        port = port,
-        server = serverBuilder.addService(RouteGuideService(messages)).build(),
-        login = login
-    )
+    val server: Server
+    init {
+        val serverBuilder = ServerBuilder.forPort(port)
+        server = serverBuilder.addService(RouteGuideService(mutableListOf())).build()
+    }
 
     fun start() {
         server.start()
@@ -45,23 +42,38 @@ class ChatServer private constructor(
 
     class RouteGuideService(
         val messages: Collection<Message>
-    ) : ChatGrpcKt.RouteGuideCoroutineImplBase() {
-        private val messages = ConcurrentHashMap<Message>()
-        override suspend fun recordMessage(requests: Flow<Message>): Any {
+    ) : ChatServerGrpc.ChatServerImplBase() {
+        override fun routeChat(responseObserver: StreamObserver<Message>): StreamObserver<Message> {
+            return object: StreamObserver<Message> {
 
+
+                override fun onNext(value: Message) {
+                    responseObserver.onNext()
+                }
+
+
+                override fun onError(t: Throwable?) {
+                    TODO("not implemented")
+                }
+
+               
+                override fun onCompleted() {
+                    TODO("not implemented")
+                }
+
+            }
         }
-
-        override fun messageChat(requests: Flow<Message>): Flow<Message> = flow {
-
-        }
-
     }
+}
+
+class ServerHelper {
 }
 
 fun main(args: Array<String>) {
     val port = args[0]
     val login = args[1]
-    val server = ChatServer(port, login)
+    val helper = ServerHelper()
+    val server = ChatServer(port.toInt(), login, helper)
     server.start()
     server.blockUntilShutdown()
 }
