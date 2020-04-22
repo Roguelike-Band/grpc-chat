@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package ru.spbau.grpc.chat;
 
+import "google/protobuf/timestamp.proto";
+
 option java_multiple_files = true;
 
 // The greeting service definition.
@@ -10,12 +12,20 @@ service Greeter {
   rpc SayHello (HelloRequest) returns (HelloReply);
 }
 
-// The request message containing the user's name.
 message HelloRequest {
   string name = 1;
 }
 
-// The response message containing the greetings
 message HelloReply {
   string message = 1;
+}
+
+service ChatServer {
+  rpc routeChat(stream Message) returns (stream Message);
+}
+
+message Message {
+  string text = 1;
+  string senderName = 2;
+  int64 utcTime = 3;
 }
