@@ -27,5 +27,5 @@ service ChatServer {
 message Message {
   string text = 1;
   string senderName = 2;
-  google.protobuf.Timestamp utcTime = 3;
+  int64 utcTime = 3;
 }
