@@ -97,7 +97,7 @@ fun main(args: Array<String>) {
         3 -> {
             val port = args[0]
             val login = args[1]
-            val host = args[3]
+            val host = args[2]
             runClient(host, port = port.toInt(), name = login)
         }
         else -> {

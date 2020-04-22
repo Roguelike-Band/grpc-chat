@@ -8,6 +8,7 @@ class Reader(private val name: String, private val messageGetter: MessageGetter)
     fun getInputFlow(): Flow<Message> = flow {
         while (true) {
             val message = readLine()
+            println("Read: $message")
             val protobufMessage = Message.newBuilder()
                 .setText(message)
                 .setSenderName(name)
