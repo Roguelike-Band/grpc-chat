@@ -19,3 +19,9 @@ message HelloRequest {
 message HelloReply {
   string message = 1;
 }
+
+message Message {
+  string text = 1;
+  string senderName = 2;
+  int64 utcTime = 3;
+}
