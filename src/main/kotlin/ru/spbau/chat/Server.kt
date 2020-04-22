@@ -5,20 +5,22 @@ import io.grpc.Server
 import io.grpc.ServerBuilder
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
 class ChatServer private constructor(
     val port: Int,
-    val server: Server
+    val server: Server,
+    val login: String
 ) {
     constructor(
         serverBuilder: ServerBuilder<*>,
         port: Int,
+        login: String,
         messages: Collection<Message>
     ) : this(
         port = port,
-        server = serverBuilder.addService(RouteGuideService(messages)).build()
+        server = serverBuilder.addService(RouteGuideService(messages)).build(),
+        login = login
     )
 
     fun start() {
@@ -46,6 +48,7 @@ class ChatServer private constructor(
     ) : ChatGrpcKt.RouteGuideCoroutineImplBase() {
         private val messages = ConcurrentHashMap<Message>()
         override suspend fun recordMessage(requests: Flow<Message>): Any {
+
         }
 
         override fun messageChat(requests: Flow<Message>): Flow<Message> = flow {
@@ -56,8 +59,9 @@ class ChatServer private constructor(
 }
 
 fun main(args: Array<String>) {
-    val port = 8980
-    val server = ChatServer(port)
+    val port = args[0]
+    val login = args[1]
+    val server = ChatServer(port, login)
     server.start()
     server.blockUntilShutdown()
 }
