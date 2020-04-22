@@ -27,7 +27,8 @@ fun runClient(host: String, port: Int, name: String) {
         .usePlaintext()
         .build())
 
-    val reader = Reader(name)
+    val messageGetter = MessageGetter()
+    val reader = Reader(name, messageGetter)
     client.connect(reader.getInputFlow())
 }
 
